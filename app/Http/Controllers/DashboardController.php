@@ -19,12 +19,16 @@ class DashboardController extends Controller
     public function toggleAi(Request $request, $id)
     {
         $account = TradingAccount::where('user_id', Auth::id())->findOrFail($id);
-        $account->update(['is_ai_active' => !$account->is_ai_active]);
+        
+        // Explicit toggle
+        $newState = !$account->is_ai_active;
+        $account->is_ai_active = $newState;
+        $account->save();
 
         return response()->json([
             'success' => true, 
             'is_ai_active' => $account->is_ai_active,
-            'message' => $account->is_ai_active ? 'AI Activated for ' . $account->login : 'AI Paused for ' . $account->login
+            'message' => $account->is_ai_active ? 'AI Activated for ' . ($account->login ?? 'Account') : 'AI Paused for ' . ($account->login ?? 'Account')
         ]);
     }
 }

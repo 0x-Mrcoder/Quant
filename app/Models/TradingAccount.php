@@ -14,6 +14,23 @@ class TradingAccount extends Model
         'password',
         'status',
         'balance',
+        'is_ai_active',
     ];
-    //
+
+    protected $casts = [
+        'is_ai_active' => 'boolean',
+        'balance' => 'decimal:2',
+    ];
+
+    // Accessor to allow $account->login to work (aliases login_id)
+    public function getLoginAttribute()
+    {
+        return $this->attributes['login_id'];
+    }
+
+    // Accessor to allow $account->type to work (aliases broker_type)
+    public function getTypeAttribute()
+    {
+        return $this->attributes['broker_type'];
+    }
 }
