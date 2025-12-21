@@ -47,5 +47,6 @@
                 &copy; {{ date('Y') }} PipFlow AI. Smart Trading.
             </div>
         </div>
+        <x-loader />
     </body>
 </html>

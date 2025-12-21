@@ -8,4 +8,12 @@ import { createChart } from 'lightweight-charts';
 window.ApexCharts = ApexCharts;
 window.createChart = createChart;
 
+document.addEventListener('alpine:init', () => {
+    Alpine.store('loader', {
+        show: false,
+        start() { this.show = true; },
+        stop() { this.show = false; }
+    });
+});
+
 Alpine.start();

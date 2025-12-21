@@ -1,12 +1,13 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-white tracking-tight">Recover Password</h2>
+        <p class="text-gray-400 text-sm mt-1">Enter your email to receive a reset link</p>
     </div>
 
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="space-y-5" @submit="$store.loader.start()">
         @csrf
 
         <!-- Email Address -->
@@ -16,10 +17,17 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <div class="pt-2">
             <x-primary-button>
-                {{ __('Email Password Reset Link') }}
+                {{ __('Send Reset Link') }}
             </x-primary-button>
+        </div>
+
+        <div class="text-center mt-6">
+            <a href="{{ route('login') }}" class="text-sm font-medium text-brand-400 hover:text-brand-300 transition-colors duration-200 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Login
+            </a>
         </div>
     </form>
 </x-guest-layout>

@@ -316,6 +316,7 @@
 
                 async submitRegistration() {
                     this.loading = true;
+                    Alpine.store('loader').start();
                     this.error = null;
                     try {
                         const res = await axios.post("{{ route('register') }}", {
@@ -329,6 +330,7 @@
                         this.error = e.response?.data?.message || 'Registration failed.';
                     } finally {
                         this.loading = false;
+                        Alpine.store('loader').stop();
                     }
                 }
             }
