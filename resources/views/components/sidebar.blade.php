@@ -44,7 +44,7 @@
                 <div class="p-1.5 rounded-lg bg-white/5 group-hover:bg-brand-500/20 group-[.active]:bg-brand-500/20 transition-colors">
                     <svg class="w-5 h-5 text-gray-500 group-hover:text-brand-400 group-[.active]:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                 </div>
-                <span class="font-medium text-gray-500 group-hover:text-white group-[.active]:text-white">Live Trading</span>
+                <span class="font-medium text-gray-500 group-hover:text-white group-[.active]:text-white">Alpha Terminal</span>
             </x-nav-link>
 
 

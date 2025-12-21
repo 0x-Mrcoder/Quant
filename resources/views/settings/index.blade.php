@@ -105,6 +105,33 @@
                              </template>
                         </div>
                     </section>
+                    
+                    <!-- Fundamental Analysis -->
+                    <section>
+                         <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
+                            Fundamental Intelligence
+                        </h3>
+                        <div class="bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-white text-lg mb-2">Integrate News Sentiment</h4>
+                                <p class="text-gray-500 text-sm leading-relaxed">
+                                    When enabled, the AI cross-references technical signals with real-time economic data (NFP, CPI, GDP) to filter out risky trades during high-impact news events.
+                                </p>
+                            </div>
+                            
+                            <!-- Fundamental Toggle -->
+                             <div class="flex items-center gap-4">
+                                <span :class="fundamentalNews ? 'text-brand-500' : 'text-gray-500'" class="font-bold text-sm" x-text="fundamentalNews ? 'ENABLED' : 'DISABLED'"></span>
+                                <button type="button" @click="fundamentalNews = !fundamentalNews" 
+                                    :class="fundamentalNews ? 'bg-brand-500' : 'bg-gray-700'"
+                                    class="relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none shadow-lg">
+                                    <span :class="fundamentalNews ? 'translate-x-7 bg-black' : 'translate-x-1 bg-white'"
+                                        class="block w-6 h-6 rounded-full transform transition-transform duration-300 shadow-sm"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
                 <!-- Right Column: Risk Management -->
@@ -173,6 +200,9 @@
                 riskPerTrade: 1.5,
                 maxTrades: 3,
                 dailyLoss: 5,
+                maxTrades: 3,
+                dailyLoss: 5,
+                fundamentalNews: true,
                 saved: false,
                 assets: [
                     { symbol: 'XAUUSD', active: true },

@@ -1,5 +1,141 @@
 <x-app-layout>
-    <div x-data="dashboard()">
+    <div x-data="{ 
+            accounts: {{ $accounts->map(fn($a) => ['id' => $a->id, 'login' => $a->login, 'server' => $a->server, 'balance' => $a->balance, 'is_ai_active' => $a->is_ai_active])->toJson() }},
+            selectedAccountId: null,
+            aiActive: false,
+            logs: [],
+            get currentAccount() {
+                if (this.accounts.length === 0) return null;
+                return this.accounts.find(a => a.id === this.selectedAccountId) || this.accounts[0];
+            },
+            formatMoney(amount) {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+            },
+            init() {
+                if (this.accounts.length > 0) {
+                    this.selectedAccountId = this.accounts[0].id;
+                    this.aiActive = !!this.accounts[0].is_ai_active;
+                }
+                this.renderChart();
+                this.startTerminal();
+
+                this.$watch('currentAccount', (val) => {
+                    if(val) {
+                        this.aiActive = !!val.is_ai_active;
+                    }
+                });
+            },
+            toggleAi() {
+                console.log('Toggle AI clicked. Current Account:', this.currentAccount);
+                if(!this.currentAccount) {
+                    console.error('No current account selected.');
+                    return;
+                }
+
+                // Optimistic UI update
+                this.aiActive = !this.aiActive;
+                console.log('Optimistic AI State:', this.aiActive);
+                
+                fetch(`/dashboard/toggle-ai/${this.currentAccount.id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Server Response:', data);
+                    if(data.success) {
+                        // Sync truth
+                        this.currentAccount.is_ai_active = data.is_ai_active; 
+                        this.aiActive = !!data.is_ai_active;
+                        this.addLog(data.message, this.aiActive ? 'text-green-400' : 'text-gray-400');
+                    } else {
+                         console.error('Server returned success: false');
+                         this.aiActive = !this.aiActive; // Revert
+                    }
+                })
+                .catch(error => {
+                    console.error('Error toggling AI:', error);
+                    this.aiActive = !this.aiActive; // Revert on error
+                    this.addLog('Connection Error: Failed to toggle AI.', 'text-red-500');
+                });
+            },
+            addLog(message, color = 'text-gray-400') {
+                const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: 'numeric', minute: 'numeric', second: 'numeric' });
+                this.logs.push({ id: Date.now(), time: `[${time}]`, message: message, color: color });
+                this.$nextTick(() => {
+                    if(this.$refs.terminal) this.$refs.terminal.scrollTop = this.$refs.terminal.scrollHeight;
+                });
+            },
+            startTerminal() {
+                const messages = [
+                    { msg: 'Scanning market structure for XAUUSD...', color: 'text-blue-400' },
+                    { msg: 'Detected liquidity void at 2035.50.', color: 'text-yellow-500' },
+                    { msg: 'Analyzing Order Flow...', color: 'text-gray-400' },
+                    { msg: 'RSI divergence confirmation on 15m timeframe.', color: 'text-green-400' },
+                    { msg: 'Waiting for entry confirmation...', color: 'text-gray-400' }
+                ];
+                
+                let i = 0;
+                this.addLog('PipFlow Core System v2.1 Initialized.', 'text-brand-500');
+                
+                setInterval(() => {
+                    if(this.aiActive && this.currentAccount) {
+                        const item = messages[Math.floor(Math.random() * messages.length)];
+                        this.addLog(item.msg, item.color);
+                    } else if (this.aiActive && !this.currentAccount) {
+                        this.addLog('Waiting for Broker Connection...', 'text-red-400');
+                    }
+                }, 3500);
+            },
+            renderChart() {
+                if(!window.ApexCharts) return;
+                
+                const options = {
+                    series: [{
+                        name: 'Equity',
+                        data: this.currentAccount ? [this.currentAccount.balance * 0.9, this.currentAccount.balance] : [0, 0]
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: 300,
+                        toolbar: { show: false },
+                        background: 'transparent',
+                        fontFamily: 'Nunito, sans-serif'
+                    },
+                    colors: ['#f59e0b'],
+                    fill: {
+                        type: 'gradient',
+                        gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] }
+                    },
+                    dataLabels: { enabled: false },
+                    stroke: { curve: 'smooth', width: 2 },
+                    xaxis: {
+                        categories: ['Start', 'Current'],
+                        axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#666' } }
+                    },
+                    yaxis: { labels: { style: { colors: '#666' } } },
+                    grid: { borderColor: '#333', strokeDashArray: 4, yaxis: { lines: { show: true } }, xaxis: { lines: { show: false } } },
+                    theme: { mode: 'dark' }
+                };
+
+                const chart = new ApexCharts(document.querySelector('#equityChart'), options);
+                chart.render();
+                
+                this.$watch('currentAccount', (val) => {
+                    if(val) {
+                        chart.updateSeries([{ data: [val.balance * 0.95, val.balance] }]);
+                    } else {
+                         chart.updateSeries([{ data: [0, 0] }]);
+                    }
+                });
+            }
+         }">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
@@ -8,16 +144,49 @@
             </div>
             
             <div class="flex items-center gap-4">
-                <!-- Strategy Selector -->
-                <div class="relative">
-                    <select class="appearance-none bg-[#0a0a0a] border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500/50">
-                        <option>Safe Scalping (Low Risk)</option>
-                        <option>Day Trading (Med Risk)</option>
-                        <option>Swing (High Risk)</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                
+                <!-- Account Selector -->
+                <div class="relative" x-data="{ open: false }" x-show="accounts.length > 0">
+                    <button @click="open = !open" @click.away="open = false" class="flex items-center gap-3 px-4 py-2 bg-[#0a0a0a] border border-white/10 rounded-xl hover:bg-white/5 transition-all min-w-[200px] justify-between group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-brand-500/10 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-[10px] text-gray-500" x-text="currentAccount ? currentAccount.server : 'Broker'"></p>
+                                <p class="text-sm font-bold text-white" x-text="currentAccount ? currentAccount.login : 'Select Account'"></p>
+                            </div>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+
+                    <div x-show="open" 
+                         class="absolute top-full right-0 mt-2 w-64 bg-[#0a0a0a] border border-white/10 rounded-xl shadow-2xl py-2 z-50">
+                        <template x-for="acc in accounts" :key="acc.id">
+                            <button @click="selectedAccountId = acc.id; open = false" 
+                                class="w-full px-4 py-3 text-left hover:bg-white/5 transition-colors flex items-center justify-between group border-b border-white/5 last:border-0">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-2 h-2 rounded-full" :class="selectedAccountId === acc.id ? 'bg-brand-500' : 'bg-gray-700'"></span>
+                                    <div>
+                                        <p class="text-sm font-bold text-white group-hover:text-brand-400" x-text="acc.login"></p>
+                                        <p class="text-[10px] text-gray-500" x-text="acc.server"></p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-mono text-gray-400" x-text="formatMoney(acc.balance)"></span>
+                            </button>
+                        </template>
+                        <a href="{{ route('settings.index') }}" class="block w-full px-4 py-3 text-center text-xs text-brand-500 hover:text-brand-400 font-bold border-t border-white/10">
+                            + Connect New Account
+                        </a>
                     </div>
+                </div>
+
+                <!-- No Accounts State -->
+                <div x-show="accounts.length === 0">
+                    <a href="{{ route('settings.index') }}" class="flex items-center gap-2 px-4 py-2 bg-brand-500 text-black text-sm font-bold rounded-xl hover:bg-brand-400 transition-colors shadow-[0_0_15px_rgba(234,179,8,0.3)]">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                        Connect Broker
+                    </a>
                 </div>
 
                 <!-- AI Toggle -->
@@ -111,8 +280,8 @@
                     <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-[50px] group-hover:bg-brand-500/20 transition-all"></div>
                     <h3 class="text-gray-500 text-sm font-medium mb-1">Total Equity</h3>
                     <div class="flex items-baseline gap-2">
-                        <span class="text-4xl font-bold text-white tracking-tight">$24,592.40</span>
-                        <span class="text-sm text-green-400 bg-green-400/10 px-2 py-0.5 rounded-lg">+12.5%</span>
+                        <span class="text-4xl font-bold text-white tracking-tight" x-text="currentAccount ? formatMoney(currentAccount.balance) : '$0.00'"></span>
+                        <span class="text-sm text-green-400 bg-green-400/10 px-2 py-0.5 rounded-lg" x-text="currentAccount ? '+4.2%' : '0%'"></span>
                     </div>
                 </div>
 
@@ -225,102 +394,5 @@
         </div>
     </div>
 
-    <script>
-        function dashboard() {
-            return {
-                aiActive: true,
-                logs: [],
-                
-                init() {
-                    this.renderChart();
-                    this.startTerminal();
-                },
 
-                toggleAi() {
-                    this.aiActive = !this.aiActive;
-                    this.addLog(this.aiActive ? 'System Manual Override: AI Activated.' : 'System Paused by User.', 'text-white');
-                },
-
-                addLog(message, color = 'text-gray-400') {
-                    const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: 'numeric', minute: 'numeric', second: 'numeric' });
-                    this.logs.push({ id: Date.now(), time: `[${time}]`, message: message, color: color });
-                    this.$nextTick(() => {
-                        this.$refs.terminal.scrollTop = this.$refs.terminal.scrollHeight;
-                    });
-                },
-
-                startTerminal() {
-                    const messages = [
-                        { msg: 'Scanning market structure for XAUUSD...', color: 'text-blue-400' },
-                        { msg: 'Detected liquidity void at 2035.50.', color: 'text-yellow-500' },
-                        { msg: 'Analyzing Order Flow...', color: 'text-gray-400' },
-                        { msg: 'RSI divergence confirmation on 15m timeframe.', color: 'text-green-400' },
-                        { msg: 'Waiting for entry confirmation...', color: 'text-gray-400' }
-                    ];
-                    
-                    let i = 0;
-                    this.addLog('PipFlow Core System v2.1 Initialized.', 'text-brand-500');
-                    
-                    setInterval(() => {
-                        if(this.aiActive) {
-                            const item = messages[Math.floor(Math.random() * messages.length)];
-                            this.addLog(item.msg, item.color);
-                        }
-                    }, 3500);
-                },
-
-                renderChart() {
-                    if(!window.ApexCharts) return; // Wait for load
-                    
-                    const options = {
-                        series: [{
-                            name: 'Equity',
-                            data: [10000, 10250, 10100, 10800, 11200, 11050, 12500, 13100, 12900, 14500, 15000, 24592]
-                        }],
-                        chart: {
-                            type: 'area',
-                            height: 300,
-                            toolbar: { show: false },
-                            background: 'transparent',
-                            fontFamily: 'Nunito, sans-serif'
-                        },
-                        colors: ['#f59e0b'],
-                        fill: {
-                            type: 'gradient',
-                            gradient: {
-                                shadeIntensity: 1,
-                                opacityFrom: 0.4,
-                                opacityTo: 0.05,
-                                stops: [0, 90, 100]
-                            }
-                        },
-                        dataLabels: { enabled: false },
-                        stroke: {
-                            curve: 'smooth',
-                            width: 2
-                        },
-                        xaxis: {
-                            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                            axisBorder: { show: false },
-                            axisTicks: { show: false },
-                            labels: { style: { colors: '#666' } }
-                        },
-                        yaxis: {
-                            labels: { style: { colors: '#666' } }
-                        },
-                        grid: {
-                            borderColor: '#333',
-                            strokeDashArray: 4,
-                            yaxis: { lines: { show: true } },
-                            xaxis: { lines: { show: false } },
-                        },
-                        theme: { mode: 'dark' }
-                    };
-
-                    const chart = new ApexCharts(document.querySelector("#equityChart"), options);
-                    chart.render();
-                }
-            }
-        }
-    </script>
 </x-app-layout>
