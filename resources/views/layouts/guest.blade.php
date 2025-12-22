@@ -9,6 +9,15 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.store('loader', {
+                    show: false,
+                    start() { this.show = true; },
+                    stop() { this.show = false; }
+                });
+            });
+        </script>
     </head>
     <body class="font-sans text-white antialiased bg-[#050505] overflow-x-hidden selection:bg-brand-500 selection:text-black">
         

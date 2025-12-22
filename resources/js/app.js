@@ -16,4 +16,13 @@ document.addEventListener('alpine:init', () => {
     });
 });
 
+// Fallback if event already fired
+if (window.Alpine) {
+    window.Alpine.store('loader', {
+        show: false,
+        start() { this.show = true; },
+        stop() { this.show = false; }
+    });
+}
+
 Alpine.start();
