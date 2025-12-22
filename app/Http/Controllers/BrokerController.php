@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Log;
 
 class BrokerController extends Controller
 {
+    protected $tradingService;
+
+    public function __construct(\App\Services\Trading\TradingServiceInterface $tradingService)
+    {
+        $this->tradingService = $tradingService;
+    }
+
     /**
      * Display connected accounts.
      */
@@ -25,30 +32,35 @@ class BrokerController extends Controller
     {
         $request->validate([
             'type' => 'required|in:mt4,mt5,deriv,crypto',
-            'login_id' => 'required', // Allow alpha for crypto users later?
+            'login_id' => 'required', 
             'password' => 'required|string',
             'server' => 'nullable|string',
         ]);
 
-        // Simulate connection delay
-        sleep(1);
+        // Attempt connection via Service (Mock or Real)
+        $result = $this->tradingService->connect(
+            $request->login_id,
+            $request->password,
+            $request->input('server', 'N/A'),
+            $request->type
+        );
 
-        // Mock Validation Logic
-        if (str_ends_with($request->login_id, '000')) {
-             return back()->withErrors(['login_id' => 'Connection failed: Invalid credentials or server timeout.']);
+        if (!$result['success']) {
+            return back()->withErrors(['login_id' => 'Connection failed: ' . $result['message']]);
         }
 
-        // Create Account
+        // Create Account (Store encrypted password automatically via model cast)
         TradingAccount::create([
             'user_id' => Auth::id(),
             'broker_type' => $request->type,
             'login_id' => $request->login_id,
             'server' => $request->input('server') ?? 'N/A',
-            'password' => $request->password, // Encrypt in prod
+            'password' => $request->password, 
             'status' => 'active',
-            'balance' => rand(1000, 50000) . '.00', // Mock balance
+            'meta_api_id' => $result['id'],
+            'balance' => $result['data']['balance'] ?? 0.00,
         ]);
 
-        return redirect()->route('accounts.index')->with('status', 'Account connected successfully!');
+        return redirect()->route('accounts.index')->with('status', 'Account connected successfully (Secured).');
     }
 }

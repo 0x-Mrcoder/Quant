@@ -96,11 +96,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-400 mb-1">Server</label>
-                                    <select name="server" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors">
-                                        <option value="MetaQuotes-Demo">MetaQuotes Demo</option>
-                                        <option value="Exness-Real">Exness Real</option>
-                                        <option value="ICMarkets-SC">IC Markets SC</option>
-                                    </select>
+                                    <label class="block text-sm font-medium text-gray-400 mb-1">Server</label>
+                                    <input type="text" name="server" class="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors" placeholder="e.g. MetaQuotes-Demo">
                                 </div>
                                 
                                 <div>

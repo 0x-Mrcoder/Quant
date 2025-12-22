@@ -41,4 +41,9 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    'meta_api' => [
+        'token' => env('META_API_TOKEN'),
+        'account_management_url' => env('META_API_URL', 'https://mt-provisioning-api-v1.agiliumtrade.agiliumtrade.ai'),
+    ],
+
 ];

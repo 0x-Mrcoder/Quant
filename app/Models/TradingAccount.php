@@ -14,12 +14,14 @@ class TradingAccount extends Model
         'password',
         'status',
         'balance',
+        'meta_api_id',
         'is_ai_active',
     ];
 
     protected $casts = [
         'is_ai_active' => 'boolean',
         'balance' => 'decimal:2',
+        'password' => 'encrypted',
     ];
 
     // Accessor to allow $account->login to work (aliases login_id)
