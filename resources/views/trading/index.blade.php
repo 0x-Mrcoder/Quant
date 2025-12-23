@@ -1,4 +1,6 @@
 <x-app-layout>
+
+    <script src="{{ asset('js/lightweight-charts.js?v=2') }}" defer onerror="console.error('Failed to load local chart lib'); document.getElementById('chart-debug').innerText = 'Failed to load JS file';"></script>
     <div class="h-[calc(100vh-5rem)] flex flex-col lg:flex-row gap-6 p-4 md:p-6" x-data="alphaTerminal()">
         
         <!-- Left Panel: Charting & Execution (Aurora Glass) -->
@@ -77,8 +79,32 @@
             <div class="flex-1 relative w-full bg-[#050505]">
                 <div id="alphaChart" class="absolute inset-0 w-full h-full"></div>
                 
+                <!-- Status Overlay (Loading/Error) -->
+                <div x-show="status.loading || status.error" 
+                     class="absolute inset-0 bg-[#050505]/80 backdrop-blur-sm flex items-center justify-center z-20">
+                    <div class="text-center">
+                        <template x-if="status.loading">
+                             <div>
+                                <svg class="animate-spin h-8 w-8 text-violet-500 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="text-gray-400 text-sm font-mono animate-pulse">Initializing Alpha Chart...</p>
+                                <p id="chart-debug" class="text-xs text-gray-600 mt-1" x-text="status.debug"></p>
+                             </div>
+                        </template>
+                        <template x-if="status.error">
+                            <div class="text-red-500">
+                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <p class="font-bold">Chart Error</p>
+                                <p class="text-sm opacity-75" x-text="status.message"></p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
                 <!-- Floating Order Panel -->
-                <div class="absolute top-4 right-4 bg-[#111]/90 backdrop-blur-md border border-white/10 rounded-xl p-4 w-64 shadow-2xl z-10">
+                <div class="absolute top-4 right-4 bg-[#111]/90 backdrop-blur-md border border-white/10 rounded-xl p-4 w-64 shadow-2xl z-10" x-show="!status.loading">
                     <div class="flex gap-2 mb-4">
                         <button class="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/20 rounded-lg text-sm font-bold transition-colors">BUY</button>
                         <button class="flex-1 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 rounded-lg text-sm font-bold transition-colors">SELL</button>
@@ -180,6 +206,7 @@
                 activeTimeframe: '1H',
                 activeAsset: 'XAUUSD',
                 fullscreen: false,
+                status: { loading: true, error: false, message: '', debug: 'Waiting for libs...' },
                 assets: {
                     'XAUUSD': { name: 'Gold Spot', price: 2034.50 },
                     'BTCUSD': { name: 'Bitcoin', price: 64200.00 },
@@ -192,10 +219,19 @@
                 candleSeries: null,
 
                 init() {
-                    this.$nextTick(() => {
-                        this.initChart();
-                        this.generateMockData();
-                    });
+                    this.waitForLib();
+                },
+
+                waitForLib() {
+                     if(window.LightweightCharts && typeof window.LightweightCharts.createChart === 'function') {
+                         this.status.debug = 'Library Loaded via ' + (window.LightweightCharts ? 'Local' : 'Unknown'); 
+                         this.initChart();
+                         this.generateMockData();
+                         this.status.loading = false;
+                     } else {
+                         this.status.debug = 'Waiting for LightweightCharts... (' + (window.LightweightCharts ? 'Object found' : 'Not found') + ')';
+                         setTimeout(() => this.waitForLib(), 200);
+                     }
                 },
 
                 formatPrice(price) {
@@ -215,9 +251,12 @@
                 initChart() {
                     const chartContainer = document.getElementById('alphaChart');
                     // Check if trading view lib is loaded, otherwise use fallback or wait
-                    if(!window.createChart) return;
+                    if(!window.LightweightCharts) {
+                        console.error('Lightweight Charts library not loaded.');
+                        return;
+                    }
 
-                    this.chart = window.createChart(chartContainer, {
+                    this.chart = window.LightweightCharts.createChart(chartContainer, {
                         layout: {
                             background: { color: '#050505' },
                             textColor: '#6b7280',
