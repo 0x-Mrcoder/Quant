@@ -271,128 +271,151 @@
         </div>
 
         <!-- Widgets Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             
-            <!-- Left Column: Metrics -->
-            <div class="lg:col-span-4 space-y-6">
-                <!-- Total Balance -->
-                <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-[50px] group-hover:bg-brand-500/20 transition-all"></div>
-                    <h3 class="text-gray-500 text-sm font-medium mb-1">Total Equity</h3>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-4xl font-bold text-white tracking-tight" x-text="currentAccount ? formatMoney(currentAccount.balance) : '$0.00'"></span>
-                        <span class="text-sm text-green-400 bg-green-400/10 px-2 py-0.5 rounded-lg" x-text="currentAccount ? '+4.2%' : '0%'"></span>
-                    </div>
-                </div>
-
-                <!-- Win Rate & Risk -->
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 flex flex-col items-center justify-center relative overflow-hidden">
-                        <div class="relative w-24 h-24 flex items-center justify-center">
-                             <!-- Simple CSS Spinner for demo -->
-                            <svg class="transform -rotate-90 w-24 h-24">
-                                <circle cx="48" cy="48" r="36" stroke="currentColor" stroke-width="8" fill="transparent" class="text-gray-800" /> 
-                                <circle cx="48" cy="48" r="36" stroke="currentColor" stroke-width="8" fill="transparent" stroke-dasharray="226" :stroke-dashoffset="226 - (226 * 78 / 100)" class="text-brand-500 transition-all duration-1000 ease-out" />
-                            </svg>
-                            <span class="absolute text-xl font-bold">78%</span>
-                        </div>
-                        <span class="text-gray-400 text-sm mt-3">Win Rate</span>
-                    </div>
-
-                    <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 flex flex-col items-center justify-center">
-                         <div class="relative w-full h-24 flex items-end justify-center pb-2">
-                            <!-- Gauge Arc -->
-                            <div class="w-24 h-12 overflow-hidden relative">
-                                <div class="w-24 h-24 rounded-full border-[8px] border-gray-800 border-b-transparent border-l-transparent transform rotate-45 absolute top-0 left-0"></div>
-                                <div class="w-24 h-24 rounded-full border-[8px] border-green-500 border-b-transparent border-l-transparent transform rotate-45 absolute top-0 left-0" style="clip-path: polygon(0 0, 100% 0, 100% 40%, 0 0);"></div>
-                            </div>
-                            <span class="absolute bottom-2 text-xl font-bold">Low</span>
-                         </div>
-                         <span class="text-gray-400 text-sm">Risk Level</span>
-                    </div>
+            <!-- Card 1: Total Equity -->
+            <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-[50px] group-hover:bg-brand-500/20 transition-all"></div>
+                <h3 class="text-gray-500 text-sm font-medium mb-1">Total Equity</h3>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-bold text-white tracking-tight" x-text="currentAccount ? formatMoney(currentAccount.balance) : '$0.00'"></span>
+                    <span class="text-sm text-green-400 bg-green-400/10 px-2 py-0.5 rounded-lg" x-text="currentAccount ? '+4.2%' : '0%'"></span>
                 </div>
             </div>
 
-            <!-- Right Column: Chart -->
-            <div class="lg:col-span-8 p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 relative">
+            <!-- Card 2: Net Profit -->
+            <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 hover:border-green-500/20 transition-all group">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-gray-500 text-sm font-medium">Net Profit</h3>
+                    <div class="p-1.5 rounded-lg bg-green-500/10 text-green-500 group-hover:bg-green-500/20 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl font-bold text-green-400">+${{ number_format($aiStats['total_profit'], 2) }}</span>
+                    <span class="text-xs text-green-500/80 bg-green-500/10 px-1.5 py-0.5 rounded">PF {{ $aiStats['profit_factor'] }}</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Total Loss -->
+            <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 hover:border-red-500/20 transition-all group">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-gray-500 text-sm font-medium">Total Loss</h3>
+                    <div class="p-1.5 rounded-lg bg-red-500/10 text-red-500 group-hover:bg-red-500/20 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" /></svg>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl font-bold text-red-400">-${{ number_format($aiStats['total_loss'], 2) }}</span>
+                    <span class="text-xs text-red-500/80">Realized</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Total Trades -->
+            <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 hover:border-blue-500/20 transition-all group">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-gray-500 text-sm font-medium">Total AI Trades</h3>
+                    <div class="p-1.5 rounded-lg bg-blue-500/10 text-blue-500 group-hover:bg-blue-500/20 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl font-bold text-white">{{ $aiStats['total_trades'] }}</span>
+                    <span class="text-xs text-blue-500">{{ $aiStats['win_rate'] }}% Win Rate</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Split -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Trade History (8 Cols) -->
+            <div class="lg:col-span-8 p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 h-fit">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="font-bold text-lg">Performance Curve</h3>
+                    <h3 class="font-bold text-lg text-white">AI Trade History</h3>
                     <div class="flex gap-2">
-                        <button class="px-3 py-1 text-xs rounded-lg bg-white/10 text-white">1D</button>
-                        <button class="px-3 py-1 text-xs rounded-lg text-gray-500 hover:bg-white/5">1W</button>
-                        <button class="px-3 py-1 text-xs rounded-lg text-gray-500 hover:bg-white/5">1M</button>
+                         <button class="px-3 py-1 text-xs font-medium rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors">All Trades</button>
+                         <button class="px-3 py-1 text-xs font-medium rounded-lg text-gray-500 hover:bg-white/5 transition-colors">Open Positions</button>
                     </div>
                 </div>
-                <div id="equityChart" class="w-full h-[300px]"></div>
-            </div>
-        </div>
-
-        <!-- Bottom: AI Terminal & Trades -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- AI Terminal -->
-            <div class="lg:col-span-2 p-6 rounded-2xl bg-[#0a0a0a] border border-brand-500/20 shadow-[0_0_30px_rgba(245,158,11,0.05)] relative overflow-hidden font-mono text-sm leading-relaxed">
-                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-brand-500 to-transparent opacity-50"></div>
                 
-                <h3 class="text-brand-400 font-bold mb-4 flex items-center gap-2">
-                    <span class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
-                    AI Live Analysis
-                </h3>
-                
-                <div class="space-y-2 h-[200px] overflow-y-auto custom-scrollbar" x-ref="terminal">
-                    <template x-for="log in logs" :key="log.id">
-                        <div class="flex gap-3">
-                            <span class="text-gray-600" x-text="log.time"></span>
-                            <span :class="log.color" x-text="log.message"></span>
-                        </div>
-                    </template>
-                    <div class="flex gap-3 animate-pulse">
-                        <span class="text-gray-600">></span>
-                        <span class="text-brand-500">_</span>
-                    </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-xs text-gray-500 border-b border-white/5">
+                                <th class="pb-3 pl-2 font-medium">PAIR</th>
+                                <th class="pb-3 font-medium">TYPE</th>
+                                <th class="pb-3 font-medium">PRICE</th>
+                                <th class="pb-3 font-medium">PROFIT/LOSS</th>
+                                <th class="pb-3 pr-2 text-right font-medium">TIME</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            @foreach($aiTrades as $trade)
+                            <tr class="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors group">
+                                <td class="py-4 pl-2 font-bold text-white">{{ $trade['pair'] }}</td>
+                                <td class="py-4">
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold uppercase {{ $trade['type'] === 'BUY' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500' }}">
+                                        {{ $trade['type'] }}
+                                    </span>
+                                </td>
+                                <td class="py-4 text-gray-400">{{ number_format($trade['price'], 5) }}</td>
+                                <td class="py-4 font-bold {{ $trade['profit'] > 0 ? 'text-green-400' : 'text-red-400' }}">
+                                    {{ $trade['profit'] > 0 ? '+' : '' }}${{ number_format($trade['profit'], 2) }}
+                                </td>
+                                <td class="py-4 pr-2 text-right text-gray-500 text-xs">{{ $trade['time']->diffForHumans() }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 pt-4 border-t border-white/5 text-center">
+                    <a href="#" class="text-xs text-gray-500 hover:text-brand-400 transition-colors">View All Transaction History &rarr;</a>
                 </div>
             </div>
 
-            <!-- Recent Trades -->
-            <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5">
-                <h3 class="font-bold text-lg mb-4">Recent Trades</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-green-500/5 border border-green-500/10">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400 font-bold text-xs">BUY</div>
-                            <div>
-                                <p class="font-bold text-sm">EUR/USD</p>
-                                <p class="text-xs text-gray-500">1.08420</p>
+            <!-- Right Column: AI Live Terminal (4 Cols) -->
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <!-- Live Terminal -->
+                <div class="p-6 rounded-2xl bg-[#0a0a0a] border border-brand-500/20 shadow-[0_0_30px_rgba(245,158,11,0.05)] relative overflow-hidden font-mono text-sm leading-relaxed flex-1 min-h-[400px]">
+                    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-brand-500 to-transparent opacity-50"></div>
+                    
+                    <h3 class="text-brand-400 font-bold mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
+                        AI Live System Log
+                    </h3>
+                    
+                    <div class="space-y-3 h-[350px] overflow-y-auto custom-scrollbar pr-2" x-ref="terminal">
+                        <template x-for="log in logs" :key="log.id">
+                            <div class="flex gap-2 text-xs">
+                                <span class="text-gray-600 shrink-0" x-text="log.time"></span>
+                                <span :class="log.color" x-text="log.message" class="break-words"></span>
                             </div>
+                        </template>
+                        <div class="flex gap-2 animate-pulse">
+                            <span class="text-gray-600">></span>
+                            <span class="text-brand-500">_</span>
                         </div>
-                        <span class="text-green-400 font-bold text-sm">+$124.50</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-red-500/5 border border-red-500/10">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 font-bold text-xs">SELL</div>
-                            <div>
-                                <p class="font-bold text-sm">XAU/USD</p>
-                                <p class="text-xs text-gray-500">2032.10</p>
-                            </div>
-                        </div>
-                        <span class="text-red-400 font-bold text-sm">-$42.10</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-green-500/5 border border-green-500/10">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400 font-bold text-xs">BUY</div>
-                            <div>
-                                <p class="font-bold text-sm">GBP/JPY</p>
-                                <p class="text-xs text-gray-500">188.450</p>
-                            </div>
-                        </div>
-                        <span class="text-green-400 font-bold text-sm">+$89.20</span>
                     </div>
                 </div>
+
+                <!-- Quick Action / Status -->
+                <div class="p-6 rounded-2xl bg-[#0a0a0a]/80 backdrop-blur border border-white/5 flex items-center justify-between">
+                     <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">System Status</p>
+                        <p class="text-white font-bold flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            Operational
+                        </p>
+                     </div>
+                     <div class="text-right">
+                        <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Latency</p>
+                        <p class="text-brand-400 font-bold mt-1">24ms</p>
+                     </div>
+                </div>
             </div>
-        </div>
-    </div>
+
+        </div>    </div>
 
 
 </x-app-layout>

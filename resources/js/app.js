@@ -2,9 +2,9 @@ import './bootstrap';
 
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
+import { createChart } from 'lightweight-charts';
 
 window.Alpine = Alpine;
-import { createChart } from 'lightweight-charts';
 window.ApexCharts = ApexCharts;
 window.createChart = createChart;
 

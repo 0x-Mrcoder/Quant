@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Log;
 
 class BrokerController extends Controller
 {
-    protected $tradingService;
+    protected $tradingFactory;
 
-    public function __construct(\App\Services\Trading\TradingServiceInterface $tradingService)
+    public function __construct(\App\Services\Trading\TradingServiceFactory $tradingFactory)
     {
-        $this->tradingService = $tradingService;
+        $this->tradingFactory = $tradingFactory;
     }
 
     /**
@@ -37,13 +37,18 @@ class BrokerController extends Controller
             'server' => 'nullable|string',
         ]);
 
-        // Attempt connection via Service (Mock or Real)
-        $result = $this->tradingService->connect(
-            $request->login_id,
-            $request->password,
-            $request->input('server', 'N/A'),
-            $request->type
-        );
+        // Attempt connection via Factory
+        try {
+            $service = $this->tradingFactory->make($request->type);
+            $result = $service->connect(
+                $request->login_id,
+                $request->password,
+                $request->input('server', 'default'),
+                $request->type
+            );
+        } catch (\Exception $e) {
+             return back()->withErrors(['login_id' => $e->getMessage()]);
+        }
 
         if (!$result['success']) {
             return back()->withErrors(['login_id' => 'Connection failed: ' . $result['message']]);

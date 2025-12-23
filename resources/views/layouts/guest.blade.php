@@ -5,8 +5,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <link rel="icon" href="{{ asset('images/favicon.png') }}" type="image/png">
         <title>{{ config('app.name', 'PipFlow AI') }}</title>
-
+   
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script>
@@ -36,12 +37,7 @@
         <div class="relative z-10 min-h-screen flex flex-col justify-center items-center pt-6 sm:pt-0 p-6">
             <div class="mb-10 text-center animate-fade-in">
                 <a href="/" class="flex flex-col items-center gap-4 group">
-                    <div class="w-16 h-16 bg-gradient-to-br from-brand-400 to-brand-600 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform duration-500 border border-brand-400/20">
-                        <svg class="w-9 h-9 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                    </div>
-                    <span class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-200 via-brand-400 to-brand-200 tracking-tight drop-shadow-sm">PipFlow AI</span>
+                    <img src="{{ asset('images/logo.png') }}" class="h-20 w-auto rounded-2xl group-hover:scale-105 transition-transform duration-500 border border-brand-400/20" alt="Logo">
                 </a>
             </div>
 

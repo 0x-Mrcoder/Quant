@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ asset('images/favicon.png') }}" type="image/png">
     <title>{{ config('app.name', 'Quant AI') }} - Institutional Grade Trading</title>
 
     <!-- Fonts -->
@@ -39,10 +40,7 @@
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
                     <a href="{{ url('/') }}" class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                            <svg class="w-5 h-5 text-black" fill="none" class="w-5 h-5 text-black" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <span class="font-display font-bold text-2xl tracking-tight text-white">Quant<span class="text-brand-500">.ai</span></span>
+                        <img src="{{ asset('images/logo.png') }}" class="h-10 w-auto rounded-lg" alt="Logo">
                     </a>
                 </div>
 
@@ -212,38 +210,155 @@
                 <p class="text-gray-400">It doesn't just execute. It thinks, analyzes, and protects your capital.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Card 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Smart Market Analysis -->
                 <div class="group p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-brand-500/50 hover:bg-white/10 transition-all duration-300">
                     <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-500/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">Multi-Dimensional Analysis</h3>
-                    <p class="text-gray-400 leading-relaxed">
-                        The AI processes Technical Charts and Fundamental News simultaneously. It understands market structure and reacts to global events instantly.
+                    <h3 class="text-xl font-bold text-white mb-3">Smart Market Analysis</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Advanced AI analyzes market patterns, news sentiment, and historical data to identify profitable trading opportunities in real-time.
                     </p>
                 </div>
 
-                <!-- Card 2 -->
+                <!-- Precision Entry & Exit -->
+                <div class="group p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-brand-500/50 hover:bg-white/10 transition-all duration-300">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-500/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Precision Entry & Exit</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Identifies optimal entry and exit points using institutional-grade strategies and smart money concepts for maximum profitability.
+                    </p>
+                </div>
+
+                <!-- Multi-Currency Trading -->
+                <div class="group p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-brand-500/50 hover:bg-white/10 transition-all duration-300">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-500/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Multi-Currency Trading</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Trades across 28+ major and minor currency pairs, automatically adapting strategies based on market volatility and conditions.
+                    </p>
+                </div>
+
+                <!-- Intelligent Risk Management -->
                 <div class="group p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-brand-500/50 hover:bg-white/10 transition-all duration-300">
                     <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-500/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">Psychology & Discipline</h3>
-                    <p class="text-gray-400 leading-relaxed">
-                        Eliminate human error and emotion. The AI applies strict reasoning and psychological safeguards to every trade, ensuring consistency.
+                    <h3 class="text-xl font-bold text-white mb-3">Intelligent Risk Management</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Automated position sizing and stop-loss management ensures your capital is protected while maximizing profit potential.
                     </p>
                 </div>
 
-                <!-- Card 3 -->
+                <!-- 24/7 Market Monitoring -->
                 <div class="group p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-brand-500/50 hover:bg-white/10 transition-all duration-300">
                     <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-500/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">Capital Protection 24/7</h3>
-                    <p class="text-gray-400 leading-relaxed">
-                        No installation needed. Our cloud-based system runs 24/7 protecting your account with advanced risk management protocols.
+                    <h3 class="text-xl font-bold text-white mb-3">24/7 Market Monitoring</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Continuously monitors global markets across all time zones, never missing trading opportunities while you sleep.
                     </p>
+                </div>
+
+                <!-- Instant Trade Execution -->
+                <div class="group p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-brand-500/50 hover:bg-white/10 transition-all duration-300">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-500/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Instant Execution</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Lightning-fast execution ensures you get the best prices with minimal slippage on every trade opportunity.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </section>
+
+    <!-- Problems We Solve Section -->
+    <section class="py-24 bg-black/40 border-y border-white/5 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Problems We Solve</h2>
+                <p class="text-gray-400">Traditional trading is plagued with human limitations. We eliminate them.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Problem: Traditional -->
+                <div class="p-8 rounded-2xl bg-[#0a0a0a] border border-red-500/20 relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Traditional Trading</h3>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="mt-1"><svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></div>
+                            <div>
+                                <h4 class="font-bold text-white">Emotional Decisions</h4>
+                                <p class="text-sm text-gray-400 mt-1">Fear and greed lead to poor timing and significant losses.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="mt-1"><svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></div>
+                            <div>
+                                <h4 class="font-bold text-white">Missed Opportunities</h4>
+                                <p class="text-sm text-gray-400 mt-1">Human traders can't monitor markets 24/7 and miss profitable trades.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="mt-1"><svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></div>
+                            <div>
+                                <h4 class="font-bold text-white">Inconsistent Strategy</h4>
+                                <p class="text-sm text-gray-400 mt-1">Manual trading lacks discipline and a systematic approach.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solution: AI -->
+                <div class="p-8 rounded-2xl bg-[#0a0a0a] border border-brand-500/20 relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-brand-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 rounded-lg bg-brand-500/10 flex items-center justify-center text-brand-500">
+                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">PipFlow AI Solution</h3>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="mt-1"><svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+                            <div>
+                                <h4 class="font-bold text-white">100% Emotion-Free</h4>
+                                <p class="text-sm text-gray-400 mt-1">AI makes decisions based purely on data, logic, and proven strategies.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="mt-1"><svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+                            <div>
+                                <h4 class="font-bold text-white">24/7 Surveillance</h4>
+                                <p class="text-sm text-gray-400 mt-1">Never miss an opportunity with continuous AI market monitoring.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="mt-1"><svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+                            <div>
+                                <h4 class="font-bold text-white">Consistent Execution</h4>
+                                <p class="text-sm text-gray-400 mt-1">Systematic approach ensures disciplined trading every single time.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -315,6 +430,73 @@
                 </div>
             </div>
         </div>
+    </section>
+
+    </section>
+
+    <!-- Supported Brokers -->
+    <section class="py-24 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="text-center mb-16">
+                 <h2 class="text-3xl font-display font-bold text-white mb-4">Supported Brokers & Platforms</h2>
+                 <p class="text-gray-400">Seamlessly integrate with your favorite trading environment.</p>
+             </div>
+             
+             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                 <!-- MT5 -->
+                 <div class="p-6 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center hover:border-brand-500/50 transition-colors">
+                     <span class="text-2xl font-bold text-white mb-2">MT5</span>
+                     <span class="text-xs text-brand-500 uppercase tracking-widest">Integrated</span>
+                 </div>
+                 <!-- MT4 -->
+                 <div class="p-6 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center hover:border-brand-500/50 transition-colors">
+                     <span class="text-2xl font-bold text-white mb-2">MT4</span>
+                     <span class="text-xs text-brand-500 uppercase tracking-widest">Integrated</span>
+                 </div>
+                 <!-- cTrader -->
+                 <div class="p-6 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center hover:border-white/20 transition-colors opacity-60">
+                     <span class="text-2xl font-bold text-white mb-2">cTrader</span>
+                     <span class="text-xs text-gray-500 uppercase tracking-widest">Coming Soon</span>
+                 </div>
+                 <!-- TradingView -->
+                 <div class="p-6 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center hover:border-white/20 transition-colors opacity-60">
+                     <span class="text-2xl font-bold text-white mb-2">TradingView</span>
+                     <span class="text-xs text-gray-500 uppercase tracking-widest">Coming Soon</span>
+                 </div>
+             </div>
+        </div>
+    </section>
+
+    <!-- Platform Availability -->
+    <section class="py-24 bg-black/40 border-b border-white/5">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Desktop -->
+                <div class="p-8 rounded-2xl bg-[#0a0a0a] border border-white/10 text-center group hover:bg-white/5 transition-colors">
+                    <div class="w-16 h-16 mx-auto bg-brand-500/10 rounded-full flex items-center justify-center text-brand-500 mb-6">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Desktop Application</h3>
+                    <p class="text-sm text-gray-400">Full-featured dashboard for Windows/Mac with advanced charting.</p>
+                </div>
+                <!-- Moibile -->
+                <div class="p-8 rounded-2xl bg-[#0a0a0a] border border-white/10 text-center group hover:bg-white/5 transition-colors">
+                    <div class="w-16 h-16 mx-auto bg-brand-500/10 rounded-full flex items-center justify-center text-brand-500 mb-6">
+                         <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Mobile App</h3>
+                    <p class="text-sm text-gray-400">iOS and Android apps for trading on-the-go with real-time alerts.</p>
+                </div>
+                <!-- Web -->
+                <div class="p-8 rounded-2xl bg-[#0a0a0a] border border-white/10 text-center group hover:bg-white/5 transition-colors">
+                    <div class="w-16 h-16 mx-auto bg-brand-500/10 rounded-full flex items-center justify-center text-brand-500 mb-6">
+                         <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Web Platform</h3>
+                    <p class="text-sm text-gray-400">Access your dashboard from any browser with cloud synchronization.</p>
+                </div>
+            </div>
+         </div>
     </section>
 
     <!-- Pricing Section -->
@@ -429,7 +611,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div class="col-span-1 md:col-span-2">
-                     <span class="font-display font-bold text-2xl text-white">Quant<span class="text-brand-500">.ai</span></span>
+                     <img src="{{ asset('images/logo.png') }}" class="h-12 w-auto rounded-lg" alt="Logo">
                      <p class="text-gray-500 mt-4 max-w-xs">
                          Advanced algorithmic trading solutions for the modern investor.
                      </p>

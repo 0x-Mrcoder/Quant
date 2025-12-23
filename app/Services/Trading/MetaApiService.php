@@ -96,4 +96,111 @@ class MetaApiService implements TradingServiceInterface
     {
         return true;
     }
+
+    // --- Trading Implementation ---
+
+    protected function getTradeUrl(): string
+    {
+        // Switch from provisioning to client API subdomain
+        return str_replace('mt-provisioning-api-v1', 'mt-client-api-v1', $this->baseUrl);
+    }
+
+    public function executeTrade(string $accountId, string $symbol, string $action, float $volume, float $stopLoss = 0, float $takeProfit = 0): array
+    {
+        return $this->placeOrder($accountId, [
+            'symbol' => $symbol,
+            'actionType' => $action === 'BUY' ? 'ORDER_TYPE_BUY' : 'ORDER_TYPE_SELL',
+            'volume' => $volume,
+            'stopLoss' => $stopLoss,
+            'takeProfit' => $takeProfit
+        ]);
+    }
+
+    public function placeLimitOrder(string $accountId, string $symbol, string $action, float $volume, float $price, float $stopLoss = 0, float $takeProfit = 0): array
+    {
+        // Map common actions to MetaApi types (e.g. BUY_LIMIT, SELL_STOP)
+        // For simplicity, assuming caller passes valid MetaApi Action Type or we keep it simple here.
+        // Let's assume $action is passed as parameter like 'ORDER_TYPE_BUY_LIMIT'
+        return $this->placeOrder($accountId, [
+            'symbol' => $symbol,
+            'actionType' => $action, 
+            'volume' => $volume,
+            'openPrice' => $price,
+            'stopLoss' => $stopLoss,
+            'takeProfit' => $takeProfit
+        ]);
+    }
+
+    protected function placeOrder(string $accountId, array $payload): array
+    {
+        try {
+            Log::info("MetaApi: Placing Order on $accountId", $payload);
+            
+            $url = "{$this->getTradeUrl()}/users/current/accounts/{$accountId}/trade";
+            
+            $response = Http::withoutVerifying()->withHeaders([
+                'auth-token' => $this->token,
+                'Content-Type' => 'application/json'
+            ])->post($url, $payload);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return [
+                    'success' => true,
+                    'id' => $data['orderId'] ?? $data['positionId'] ?? 'unknown',
+                    'message' => 'Order executed successfully',
+                    'data' => $data
+                ];
+            }
+
+            Log::error("MetaApi Order Fail: " . $response->body());
+            return ['success' => false, 'message' => $response->json()['message'] ?? 'Order failed'];
+
+        } catch (\Exception $e) {
+            Log::error("MetaApi Error: " . $e->getMessage());
+            return ['success' => false, 'message' => 'System error placing order'];
+        }
+    }
+
+    public function modifyTrade(string $accountId, string $tradeId, float $stopLoss, float $takeProfit): array
+    {
+        try {
+            $url = "{$this->getTradeUrl()}/users/current/accounts/{$accountId}/orders/{$tradeId}";
+            
+            $response = Http::withoutVerifying()->withHeaders([
+                'auth-token' => $this->token,
+            ])->put($url, [
+                'actionType' => 'ORDER_MODIFY', 
+                'stopLoss' => $stopLoss,
+                'takeProfit' => $takeProfit
+            ]);
+
+            return $response->successful() 
+                ? ['success' => true, 'message' => 'Trade modified']
+                : ['success' => false, 'message' => 'Modify failed: ' . $response->body()];
+
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function closeTrade(string $accountId, string $tradeId): array
+    {
+        try {
+            // Note: Close often uses a separate endpoint or 'ORDER_CLOSE' action
+            // Using the MetaApi "close position" pattern usually
+            $url = "{$this->getTradeUrl()}/users/current/accounts/{$accountId}/positions/{$tradeId}/close";
+            
+            $response = Http::withoutVerifying()->withHeaders([
+                'auth-token' => $this->token,
+            ])->post($url, []);
+
+             return $response->successful() 
+                ? ['success' => true, 'message' => 'Trade closed']
+                : ['success' => false, 'message' => 'Close failed: ' . $response->body()];
+
+        } catch (\Exception $e) {
+             return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
 }
