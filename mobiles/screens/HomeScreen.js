@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, Animated, Easing, Modal, ScrollView, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, Animated, Easing, Modal, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Settings, Zap, Power, Disc, Activity, ChevronDown, Plus, Monitor, TerminalSquare, TrendingUp, BarChart3 } from 'lucide-react-native';
+import { Settings, Zap, Power, Disc, Activity, ChevronDown, Plus, Monitor, TerminalSquare, TrendingUp, BarChart3, ShieldCheck, ArrowRight } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
-// Mock Data
-const MOCK_ACCOUNTS = [
-    {
-        id: '1', login: '501239912', server: 'Deriv-Server',
-        balance: 24592.50, profit: 1250.50, strategy: 'Hybrid',
-        totalTrades: 142, winRate: 78,
-    },
-    {
-        id: '2', login: '882103445', server: 'Exness-Real',
-        balance: 12050.00, profit: 120.00, strategy: 'SMC Safe',
-        totalTrades: 12, winRate: 65,
-    }
-];
+// Mock Data (Moved outside to be used only when connected)
+const FULL_MOCK_ACCOUNT = {
+    id: '1', login: '501239912', server: 'Deriv-Server',
+    balance: 24592.50, profit: 1250.50, strategy: 'Hybrid',
+    totalTrades: 142, winRate: 78,
+};
 
-// Mock AI Logs
 const AI_LOGS = [
     { time: '10:42:01', msg: 'Scanning EURUSD (H1) for liquidity sweeps...' },
     { time: '10:42:05', msg: 'No high-probability setups found.' },
@@ -29,26 +21,35 @@ const AI_LOGS = [
 ];
 
 export default function HomeScreen({ navigation, route }) {
-    const [accounts, setAccounts] = useState(MOCK_ACCOUNTS);
-    const [activeAccountId, setActiveAccountId] = useState(MOCK_ACCOUNTS[0].id);
+    // START EMPTY by default
+    const [accounts, setAccounts] = useState([]);
+    const [activeAccountId, setActiveAccountId] = useState(null);
     const [isSwitcherVisible, setSwitcherVisible] = useState(false);
     const [isActive, setIsActive] = useState(false);
     const [pulseAnim] = useState(new Animated.Value(1));
-    const [logs, setLogs] = useState(AI_LOGS);
+    const [logs, setLogs] = useState([]);
 
-    const activeAccount = accounts.find(a => a.id === activeAccountId) || MOCK_ACCOUNTS[0];
+    const activeAccount = accounts.find(a => a.id === activeAccountId) || null;
+    const isConnected = accounts.length > 0;
 
-    // Effect: Handle New Connection
+    // Effect: Handle New Connection or Fresh Signup
     useEffect(() => {
         if (route.params?.newAccount) {
-            setAccounts(prev => [...prev, route.params.newAccount]);
-            setActiveAccountId(route.params.newAccount.id);
+            // User connected a broker
+            const newAcc = route.params.newAccount;
+            setAccounts(prev => [...prev, newAcc]);
+            setActiveAccountId(newAcc.id);
+            setLogs(AI_LOGS); // Start showing logs
+        } else if (route.params?.isFreshSignup) {
+            // Fresh signup - ensure empty
+            setAccounts([]);
+            setActiveAccountId(null);
         }
-    }, [route.params?.newAccount]);
+    }, [route.params]);
 
-    // Live Log Simulation
+    // Live Log Simulation (Only if connected)
     useEffect(() => {
-        if (isActive) {
+        if (isActive && isConnected) {
             const interval = setInterval(() => {
                 const newLog = {
                     time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
@@ -58,11 +59,11 @@ export default function HomeScreen({ navigation, route }) {
             }, 3000);
             return () => clearInterval(interval);
         }
-    }, [isActive]);
+    }, [isActive, isConnected]);
 
     // Animation
     useEffect(() => {
-        if (isActive) {
+        if (isActive && isConnected) {
             Animated.loop(
                 Animated.sequence([
                     Animated.timing(pulseAnim, { toValue: 1.2, duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
@@ -72,7 +73,7 @@ export default function HomeScreen({ navigation, route }) {
         } else {
             pulseAnim.setValue(1);
         }
-    }, [isActive]);
+    }, [isActive, isConnected]);
 
     // --- RENDER ---
     return (
@@ -82,22 +83,35 @@ export default function HomeScreen({ navigation, route }) {
             <View className="px-6 py-4 flex-row justify-between items-start mb-6">
                 <TouchableOpacity
                     activeOpacity={0.7}
-                    onPress={() => setSwitcherVisible(true)}
+                    onPress={() => isConnected && setSwitcherVisible(true)}
                     className="flex-row items-center gap-2"
                 >
                     <View>
-                        <Text className="text-gray-500 text-xs font-bold tracking-widest uppercase mb-1">
-                            {activeAccount.server}
-                        </Text>
-                        <View className="flex-row items-center gap-2">
-                            <Text className="text-white font-bold text-3xl font-sans">
-                                ${(activeAccount.balance).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                            </Text>
-                            <ChevronDown color="#6b7280" size={20} />
-                        </View>
-                        <Text className="text-gray-600 text-xs font-bold tracking-widest uppercase mt-0.5">
-                            ID: {activeAccount.login}
-                        </Text>
+                        {isConnected ? (
+                            <>
+                                <Text className="text-gray-500 text-xs font-bold tracking-widest uppercase mb-1">
+                                    {activeAccount?.server}
+                                </Text>
+                                <View className="flex-row items-center gap-2">
+                                    <Text className="text-white font-bold text-3xl font-sans">
+                                        ${(activeAccount?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                    </Text>
+                                    <ChevronDown color="#6b7280" size={20} />
+                                </View>
+                                <Text className="text-gray-600 text-xs font-bold tracking-widest uppercase mt-0.5">
+                                    ID: {activeAccount?.login}
+                                </Text>
+                            </>
+                        ) : (
+                            <View>
+                                <Text className="text-gray-500 text-xs font-bold tracking-widest uppercase mb-1">
+                                    Welcome
+                                </Text>
+                                <Text className="text-white font-bold text-2xl font-sans">
+                                    Ready to Trade?
+                                </Text>
+                            </View>
+                        )}
                     </View>
                 </TouchableOpacity>
 
@@ -111,107 +125,152 @@ export default function HomeScreen({ navigation, route }) {
 
             <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 100 }}>
 
-                {/* 2. The Activator (Compact) */}
-                <View className="items-center justify-center mb-8">
-                    <TouchableOpacity
-                        onPress={() => setIsActive(!isActive)}
-                        activeOpacity={0.8}
-                        className="items-center justify-center relative mb-4"
-                    >
-                        {isActive && (
-                            <Animated.View
-                                className="absolute w-40 h-40 bg-emerald-500/20 rounded-full"
-                                style={{ transform: [{ scale: pulseAnim }] }}
-                            />
-                        )}
-                        <View className={`w-32 h-32 rounded-full items-center justify-center border-4 shadow-2xl transition-all ${isActive ? 'bg-black border-emerald-500 shadow-emerald-500/20' : 'bg-white border-white shadow-white/10'}`}>
-                            <Power color={isActive ? '#10b981' : '#000'} size={40} fill={isActive ? '#10b981' : 'none'} />
-                        </View>
-                    </TouchableOpacity>
-                    <View className={`px-4 py-1.5 rounded-full ${isActive ? 'bg-emerald-500/10' : 'bg-white/5'}`}>
-                        <Text className={`font-bold text-xs tracking-widest ${isActive ? 'text-emerald-400' : 'text-gray-500'}`}>
-                            {isActive ? 'AI ENGINE: ONLINE' : 'STANDBY MODE'}
-                        </Text>
-                    </View>
-                </View>
+                {/* FRESH ACCOUNT STATE */}
+                {!isConnected ? (
+                    <View className="px-6 mt-10">
+                        {/* Minimal Hero Card */}
+                        <View className="bg-[#111] rounded-3xl p-8 border border-white/5 items-center relative overflow-hidden">
+                            <View className="absolute inset-0 bg-brand-500/5 blur-xl" />
 
-                {/* 3. Performance Matrix (New Transparency Feature) */}
-                <View className="px-6 mb-6">
-                    <Text className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-3">Performance Matrix</Text>
-                    <View className="flex-row gap-4 mb-4">
-                        {/* Profit Card */}
-                        <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5">
-                            <View className="flex-row items-center gap-2 mb-2">
-                                <Activity color="#10b981" size={16} />
-                                <Text className="text-gray-400 text-xs font-bold uppercase">Total Profit</Text>
+                            <View className="w-20 h-20 bg-[#1a1a1a] rounded-full items-center justify-center mb-6 border border-white/10 shadow-xl">
+                                <Zap color="#f59e0b" size={32} fill="#f59e0b" />
                             </View>
-                            <Text className="text-white font-bold text-lg">
-                                {activeAccount.profit >= 0 ? '+' : ''}${activeAccount.profit.toLocaleString()}
-                            </Text>
-                        </View>
-                        {/* Win Rate Card */}
-                        <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5">
-                            <View className="flex-row items-center gap-2 mb-2">
-                                <TrendingUp color="#f59e0b" size={16} />
-                                <Text className="text-gray-400 text-xs font-bold uppercase">Win Rate</Text>
-                            </View>
-                            <Text className="text-white font-bold text-lg">
-                                {activeAccount.winRate}%
-                            </Text>
-                        </View>
-                    </View>
-                    <View className="flex-row gap-4">
-                        {/* Total Trades Card */}
-                        <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5">
-                            <View className="flex-row items-center gap-2 mb-2">
-                                <BarChart3 color="#3b82f6" size={16} />
-                                <Text className="text-gray-400 text-xs font-bold uppercase">Total Trades</Text>
-                            </View>
-                            <Text className="text-white font-bold text-lg">
-                                {activeAccount.totalTrades}
-                            </Text>
-                        </View>
-                        {/* Strategy Card */}
-                        <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5">
-                            <View className="flex-row items-center gap-2 mb-2">
-                                <Disc color="#8b5cf6" size={16} />
-                                <Text className="text-gray-400 text-xs font-bold uppercase">Mode</Text>
-                            </View>
-                            <Text className="text-white font-bold text-lg" numberOfLines={1}>
-                                {activeAccount.strategy}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
 
-                {/* 4. AI Live Terminal (Transparency Feature) */}
-                <View className="px-6 mb-8">
-                    <View className="flex-row items-center gap-2 mb-3">
-                        <TerminalSquare color="#6b7280" size={14} />
-                        <Text className="text-gray-500 text-xs font-bold uppercase tracking-widest">Live Engine Logs</Text>
-                    </View>
+                            <Text className="text-white font-bold text-2xl text-center mb-3">
+                                Connect Your Broker
+                            </Text>
+                            <Text className="text-gray-400 text-center leading-relaxed mb-8">
+                                Link your trading account (MT4/MT5) to activate the PipFlow AI engine. We only execute; you stay in control.
+                            </Text>
 
-                    <View className="bg-[#0a0a0a] rounded-2xl p-4 border border-white/5 h-40">
-                        <View className="flex-1">
-                            {logs.map((log, index) => (
-                                <View key={index} className="flex-row gap-3 mb-2">
-                                    <Text className="text-gray-600 text-[10px] font-mono mt-0.5">{log.time}</Text>
-                                    <Text className="text-gray-400 text-xs font-mono flex-1 leading-5">{log.msg}</Text>
+                            <TouchableOpacity
+                                className="w-full bg-brand-500 py-4 rounded-xl flex-row items-center justify-center shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
+                                onPress={() => navigation.navigate('ConnectBroker')}
+                            >
+                                <Text className="text-white font-bold text-lg mr-2">Connect Account</Text>
+                                <ArrowRight color="white" size={20} />
+                            </TouchableOpacity>
+
+                            <View className="flex-row items-center gap-2 mt-6">
+                                <ShieldCheck color="#10b981" size={14} />
+                                <Text className="text-gray-600 text-xs font-bold uppercase">Bank-Grade Encryption</Text>
+                            </View>
+                        </View>
+
+                        {/* Teaser Data (Blurred or Placeholder) */}
+                        <View className="mt-10 opacity-30">
+                            <Text className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-3">AI Engine Preview</Text>
+                            <View className="flex-row gap-4 mb-4">
+                                <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5 h-24" />
+                                <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5 h-24" />
+                            </View>
+                        </View>
+                    </View>
+                ) : (
+                    <>
+                        {/* 2. The Activator (Compact) */}
+                        <View className="items-center justify-center mb-8">
+                            <TouchableOpacity
+                                onPress={() => setIsActive(!isActive)}
+                                activeOpacity={0.8}
+                                className="items-center justify-center relative mb-4"
+                            >
+                                {isActive && (
+                                    <Animated.View
+                                        className="absolute w-40 h-40 bg-emerald-500/20 rounded-full"
+                                        style={{ transform: [{ scale: pulseAnim }] }}
+                                    />
+                                )}
+                                <View className={`w-32 h-32 rounded-full items-center justify-center border-4 shadow-2xl transition-all ${isActive ? 'bg-black border-emerald-500 shadow-emerald-500/20' : 'bg-white border-white shadow-white/10'}`}>
+                                    <Power color={isActive ? '#10b981' : '#000'} size={40} fill={isActive ? '#10b981' : 'none'} />
                                 </View>
-                            ))}
-                        </View>
-                        {isActive && (
-                            <View className="flex-row items-center gap-2 mt-2">
-                                <View className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                                <Text className="text-emerald-500 text-[10px] font-bold">LIVE PROCESSING</Text>
+                            </TouchableOpacity>
+                            <View className={`px-4 py-1.5 rounded-full ${isActive ? 'bg-emerald-500/10' : 'bg-white/5'}`}>
+                                <Text className={`font-bold text-xs tracking-widest ${isActive ? 'text-emerald-400' : 'text-gray-500'}`}>
+                                    {isActive ? 'AI ENGINE: ONLINE' : 'STANDBY MODE'}
+                                </Text>
                             </View>
-                        )}
-                    </View>
-                </View>
+                        </View>
+
+                        {/* 3. Performance Matrix */}
+                        <View className="px-6 mb-6">
+                            <Text className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-3">Performance Matrix</Text>
+                            <View className="flex-row gap-4 mb-4">
+                                {/* Profit Card */}
+                                <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5">
+                                    <View className="flex-row items-center gap-2 mb-2">
+                                        <Activity color="#10b981" size={16} />
+                                        <Text className="text-gray-400 text-xs font-bold uppercase">Total Profit</Text>
+                                    </View>
+                                    <Text className="text-white font-bold text-lg">
+                                        {activeAccount.profit >= 0 ? '+' : ''}${activeAccount.profit.toLocaleString()}
+                                    </Text>
+                                </View>
+                                {/* Win Rate Card */}
+                                <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5">
+                                    <View className="flex-row items-center gap-2 mb-2">
+                                        <TrendingUp color="#f59e0b" size={16} />
+                                        <Text className="text-gray-400 text-xs font-bold uppercase">Win Rate</Text>
+                                    </View>
+                                    <Text className="text-white font-bold text-lg">
+                                        {activeAccount.winRate}%
+                                    </Text>
+                                </View>
+                            </View>
+                            <View className="flex-row gap-4">
+                                {/* Total Trades Card */}
+                                <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5">
+                                    <View className="flex-row items-center gap-2 mb-2">
+                                        <BarChart3 color="#3b82f6" size={16} />
+                                        <Text className="text-gray-400 text-xs font-bold uppercase">Total Trades</Text>
+                                    </View>
+                                    <Text className="text-white font-bold text-lg">
+                                        {activeAccount.totalTrades}
+                                    </Text>
+                                </View>
+                                {/* Strategy Card */}
+                                <View className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5">
+                                    <View className="flex-row items-center gap-2 mb-2">
+                                        <Disc color="#8b5cf6" size={16} />
+                                        <Text className="text-gray-400 text-xs font-bold uppercase">Mode</Text>
+                                    </View>
+                                    <Text className="text-white font-bold text-lg" numberOfLines={1}>
+                                        {activeAccount.strategy}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        {/* 4. AI Live Terminal */}
+                        <View className="px-6 mb-8">
+                            <View className="flex-row items-center gap-2 mb-3">
+                                <TerminalSquare color="#6b7280" size={14} />
+                                <Text className="text-gray-500 text-xs font-bold uppercase tracking-widest">Live Engine Logs</Text>
+                            </View>
+
+                            <View className="bg-[#0a0a0a] rounded-2xl p-4 border border-white/5 h-40">
+                                <ScrollView className="flex-1">
+                                    {logs.map((log, index) => (
+                                        <View key={index} className="flex-row gap-3 mb-2">
+                                            <Text className="text-gray-600 text-[10px] font-mono mt-0.5">{log.time}</Text>
+                                            <Text className="text-gray-400 text-xs font-mono flex-1 leading-5">{log.msg}</Text>
+                                        </View>
+                                    ))}
+                                </ScrollView>
+                                {isActive && (
+                                    <View className="flex-row items-center gap-2 mt-2">
+                                        <View className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                                        <Text className="text-emerald-500 text-[10px] font-bold">LIVE PROCESSING</Text>
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                    </>
+                )}
 
             </ScrollView>
 
-            {/* Account Switcher Modal (Reused) */}
+            {/* Account Switcher Modal */}
             <Modal
                 animationType="slide"
                 transparent={true}

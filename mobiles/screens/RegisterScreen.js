@@ -233,7 +233,7 @@ export default function RegisterScreen({ navigation }) {
                             className="w-full bg-white rounded-xl py-4 items-center shadow-lg active:scale-95"
                             onPress={() => {
                                 setShowSuccess(false);
-                                navigation.replace('Main');
+                                navigation.replace('Main', { screen: 'Home', params: { isFreshSignup: true } });
                             }}
                         >
                             <Text className="text-black font-bold text-lg font-sans">Go to Dashboard</Text>

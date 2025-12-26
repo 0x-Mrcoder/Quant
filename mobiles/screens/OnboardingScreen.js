@@ -8,20 +8,20 @@ const { width, height } = Dimensions.get('window');
 const SLIDES = [
     {
         id: '1',
-        title: ['Master the Markets', 'with AI'],
-        description: 'Real-time signals, automated strategies, and simplified execution. All in your pocket.',
-        image: require('../assets/logo.png'), // Replace with illustration later if needed
+        title: ['Meet PipFlow', 'AI Trading'],
+        description: 'Harness the power of institutional-grade algorithms. Our neural network scans markets 24/7 to find precision entries.',
+        image: require('../assets/logo.png'),
     },
     {
         id: '2',
-        title: ['Smart Signals', '& Analytics'],
-        description: 'Get notified instantly when our AI detects high-probability trade setups.',
+        title: ['Precision', 'Without Emotion'],
+        description: 'Eliminate human error. PipFlow executes trades based on logic, data, and proven strategies—not fear or greed.',
         image: require('../assets/logo.png'),
     },
     {
         id: '3',
-        title: ['One-Click', 'Execution'],
-        description: 'Trade XAUUSD, BTC, and Forex pairs with a single tap. Complete control.',
+        title: ['Your Wealth', 'On Autopilot'],
+        description: 'Experience true freedom. Connect your broker once, and watch as the AI manages your portfolio in real-time.',
         image: require('../assets/logo.png'),
     },
 ];

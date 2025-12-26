@@ -513,7 +513,7 @@
                     <h3 class="text-xl font-bold text-white mb-2">Starter</h3>
                     <p class="text-gray-400 text-sm mb-6">For traders exploring AI automation.</p>
                     <div class="mb-6">
-                        <span class="text-4xl font-bold text-white">$0</span>
+                        <span class="text-4xl font-bold text-white">$49.99</span>
                         <span class="text-gray-500">/month</span>
                     </div>
                     <ul class="space-y-4 mb-8 flex-1">
@@ -539,7 +539,7 @@
                     <h3 class="text-xl font-bold text-white mb-2">Professional</h3>
                     <p class="text-gray-400 text-sm mb-6">For serious traders seeking an edge.</p>
                     <div class="mb-6">
-                        <span class="text-4xl font-bold text-white">$49</span>
+                        <span class="text-4xl font-bold text-white">$499.99</span>
                         <span class="text-gray-500">/month</span>
                     </div>
                     <ul class="space-y-4 mb-8 flex-1">
@@ -568,7 +568,7 @@
                     <h3 class="text-xl font-bold text-white mb-2">Institutional</h3>
                     <p class="text-gray-400 text-sm mb-6">Custom solutions for funds & props.</p>
                     <div class="mb-6">
-                        <span class="text-4xl font-bold text-white">$299</span>
+                        <span class="text-4xl font-bold text-white">$999.99</span>
                         <span class="text-gray-500">/month</span>
                     </div>
                     <ul class="space-y-4 mb-8 flex-1">
