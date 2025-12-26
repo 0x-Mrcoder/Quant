@@ -1,73 +1,162 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Platform, Vibration, Animated } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Home, TrendingUp, History, Settings } from 'lucide-react-native';
+import { House, BrainCircuit, ScrollText, UserCog } from 'lucide-react-native';
 
-// Import Screens (We will create these next)
+// Import Screens
 import HomeScreen from '../screens/HomeScreen';
 import TradeScreen from '../screens/TradeScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
+const { width } = Dimensions.get('window');
 
+// --- Custom Tab Bar Component ---
+function CustomTabBar({ state, descriptors, navigation }) {
+    // Animation for the "active indicator" (optional, for now we stick to refined icon states)
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.glassBackground}>
+                {state.routes.map((route, index) => {
+                    const { options } = descriptors[route.key];
+                    const isFocused = state.index === index;
+
+                    const activeColor = '#f59e0b'; // Amber-500
+                    const inactiveColor = '#6b7280'; // Gray-500
+
+                    // Icon Mapping
+                    let IconComponent = House;
+                    if (route.name === 'Home') IconComponent = House;
+                    else if (route.name === 'AITrading') IconComponent = BrainCircuit;
+                    else if (route.name === 'History') IconComponent = ScrollText;
+                    else if (route.name === 'Mine') IconComponent = UserCog;
+
+                    // Label Mapping
+                    let label = 'Home';
+                    if (route.name === 'AITrading') label = 'AI Trading';
+                    else if (route.name === 'History') label = 'History';
+                    else if (route.name === 'Mine') label = 'Mine';
+
+                    const onPress = () => {
+                        const event = navigation.emit({
+                            type: 'tabPress',
+                            target: route.key,
+                            canPreventDefault: true,
+                        });
+
+                        if (!isFocused && !event.defaultPrevented) {
+                            // Haptic Feedback
+                            Vibration.vibrate(10);
+
+                            navigation.navigate(route.name);
+                        }
+                    };
+
+                    return (
+                        <TouchableOpacity
+                            key={index}
+                            accessibilityRole="button"
+                            accessibilityState={isFocused ? { selected: true } : {}}
+                            onPress={onPress}
+                            style={styles.tabButton}
+                            activeOpacity={0.7}
+                        >
+                            <View style={[
+                                styles.iconContainer,
+                                isFocused && styles.activeIconContainer
+                            ]}>
+                                <IconComponent
+                                    color={isFocused ? activeColor : inactiveColor}
+                                    size={24}
+                                    strokeWidth={isFocused ? 2.5 : 2}
+                                    fill={isFocused && route.name === 'AITrading' ? activeColor : 'none'}
+                                />
+                            </View>
+
+                            {/* Animated Label */}
+                            {isFocused && (
+                                <Text style={[styles.label, { color: activeColor }]}>
+                                    {label}
+                                </Text>
+                            )}
+                        </TouchableOpacity>
+                    );
+                })}
+            </View>
+        </View>
+    );
+}
+
+// --- Main Navigator ---
 export default function BottomTabNavigator() {
     return (
         <Tab.Navigator
+            tabBar={props => <CustomTabBar {...props} />}
             screenOptions={{
                 headerShown: false,
-                tabBarStyle: {
-                    backgroundColor: '#0a0a0a',
-                    borderTopColor: '#ffffff10',
-                    height: 90, // Taller tab bar
-                    paddingTop: 10,
-                    paddingBottom: 30,
-                },
-                tabBarActiveTintColor: '#8b5cf6', // Violet
-                tabBarInactiveTintColor: '#6b7280', // Gray
-                tabBarLabelStyle: {
-                    fontSize: 10,
-                    fontWeight: '600',
-                    marginTop: 5,
-                }
             }}
         >
-            <Tab.Screen
-                name="Dashboard"
-                component={HomeScreen}
-                options={{
-                    tabBarIcon: ({ color, size }) => <Home color={color} size={24} />,
-                    tabBarLabel: 'Home'
-                }}
-            />
-            <Tab.Screen
-                name="Trade"
-                component={TradeScreen} // Will be TradeScreen
-                options={{
-                    tabBarIcon: ({ color, focused }) => (
-                        <View className={`p-3 rounded-full ${focused ? 'bg-brand-500/20' : 'bg-transparent'}`}>
-                            <TrendingUp color={focused ? '#8b5cf6' : '#6b7280'} size={24} />
-                        </View>
-                    ),
-                    tabBarLabel: 'Trade'
-                }}
-            />
-            <Tab.Screen
-                name="History"
-                component={HistoryScreen} // Will be HistoryScreen
-                options={{
-                    tabBarIcon: ({ color }) => <History color={color} size={24} />,
-                    tabBarLabel: 'History'
-                }}
-            />
-            <Tab.Screen
-                name="Settings"
-                component={SettingsScreen} // Will be SettingsScreen
-                options={{
-                    tabBarIcon: ({ color }) => <Settings color={color} size={24} />,
-                    tabBarLabel: 'Settings'
-                }}
-            />
+            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="AITrading" component={TradeScreen} />
+            <Tab.Screen name="History" component={HistoryScreen} />
+            <Tab.Screen name="Mine" component={SettingsScreen} />
         </Tab.Navigator>
     );
 }
+
+// --- Styles for "Premium Island" ---
+const styles = StyleSheet.create({
+    container: {
+        position: 'absolute',
+        bottom: Platform.OS === 'ios' ? 25 : 20,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        // Make it invisible container so the glass bar floats
+        backgroundColor: 'transparent',
+    },
+    glassBackground: {
+        flexDirection: 'row',
+        width: width - 40, // 20 margin each side
+        height: 70,
+        backgroundColor: '#111111', // Deep dark
+        borderRadius: 35,
+        alignItems: 'center',
+        justifyContent: 'space-around', // Distribute items evenly
+        paddingHorizontal: 10,
+
+        // Borders & Shadows
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.5,
+        shadowRadius: 20,
+        elevation: 10,
+    },
+    tabButton: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        flex: 1,
+    },
+    iconContainer: {
+        padding: 8,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    activeIconContainer: {
+        backgroundColor: 'rgba(245, 158, 11, 0.15)', // Brand/20
+    },
+    label: {
+        position: 'absolute',
+        bottom: 8, // Push to bottom of container
+        fontSize: 10,
+        fontWeight: 'bold',
+        fontFamily: Platform.OS === 'ios' ? 'Nunito-Bold' : 'sans-serif', // Fallback
+    }
+});

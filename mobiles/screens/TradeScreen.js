@@ -1,76 +1,203 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Dimensions, ScrollView, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronDown, Plus, Minus } from 'lucide-react-native';
+import { ChevronDown, Brain, Zap, Send, Activity, Check } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
-// Mock Chart Bars
-const ChartBar = ({ height, color }) => (
-    <View style={{ height, width: (width - 48) / 20, backgroundColor: color, borderRadius: 2, marginRight: 4 }} />
-);
+// Available Pairs for Selection
+const AVAILABLE_PAIRS = [
+    { id: 'XAUUSD', name: 'Gold', rate: '2034.50', change: '+1.24%' },
+    { id: 'EURUSD', name: 'Euro', rate: '1.0924', change: '-0.15%' },
+    { id: 'GBPUSD', name: 'Pound', rate: '1.2750', change: '+0.05%' },
+    { id: 'BTCUSD', name: 'Bitcoin', rate: '42150.00', change: '+2.10%' },
+    { id: 'US30', name: 'Dow Jones', rate: '37400.00', change: '+0.50%' },
+];
 
-export default function TradeScreen() {
+import LiveChart from '../components/LiveChart';
+
+const MOCK_CHAT = [
+    { id: 1, sender: 'AI', text: 'Analyzing XAUUSD order flow...', time: '10:23' },
+    { id: 2, sender: 'AI', text: 'Bullish divergence detected on M15. Key support at 2032.50.', time: '10:23' },
+];
+
+export default function TradeScreen({ navigation }) {
+    const [messages, setMessages] = useState(MOCK_CHAT);
+    const [input, setInput] = useState('');
+    const [activeTab, setActiveTab] = useState('Chart'); // Chart, Chat
+
+    // Pair Selection State
+    const [selectedPairs, setSelectedPairs] = useState(['XAUUSD']);
+    const [showPairSelector, setShowPairSelector] = useState(false);
+
+    const togglePair = (id) => {
+        if (selectedPairs.includes(id)) {
+            // Prevent deselecting the last one
+            if (selectedPairs.length > 1) {
+                setSelectedPairs(selectedPairs.filter(p => p !== id));
+            }
+        } else {
+            setSelectedPairs([...selectedPairs, id]);
+        }
+    };
+
+    const sendMessage = () => {
+        if (!input.trim()) return;
+        const newMsg = { id: Date.now(), sender: 'User', text: input, time: 'Now' };
+        setMessages(prev => [...prev, newMsg]);
+        setInput('');
+
+        // Sim AI Response
+        setTimeout(() => {
+            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'AI', text: 'Copy that. Recalculating risk parameters based on your input.', time: 'Now' }]);
+        }, 1000);
+    };
+
     return (
-        <SafeAreaView className="flex-1 bg-dark-bg">
-            {/* Header / Asset Selector */}
-            <View className="px-6 py-4 border-b border-white/5 flex-row justify-between items-center">
-                <TouchableOpacity className="flex-row items-center gap-2">
+        <SafeAreaView className="flex-1 bg-[#050505] font-sans">
+
+            {/* 1. Header: Alpha Terminal Style */}
+            <View className="px-5 py-3 border-b border-white/5 flex-row justify-between items-center bg-[#050505] z-30 shadow-lg relative">
+                <TouchableOpacity
+                    className="flex-row items-center gap-3 active:opacity-70"
+                    onPress={() => setShowPairSelector(!showPairSelector)}
+                >
+                    <LinearGradient
+                        colors={['#8b5cf6', '#d946ef']}
+                        className="w-10 h-10 rounded-xl items-center justify-center"
+                        style={{ shadowColor: '#8b5cf6', shadowOpacity: 0.3, shadowRadius: 10 }}
+                    >
+                        <Text className="text-white font-bold text-xs">{selectedPairs.length > 1 ? 'ALL' : selectedPairs[0].substring(0, 2)}</Text>
+                    </LinearGradient>
                     <View>
-                        <Text className="text-white font-bold text-xl text-left">XAUUSD</Text>
-                        <Text className="text-gray-400 text-xs text-left">Gold vs US Dollar</Text>
+                        <Text className="text-white font-bold text-lg leading-tight flex-row items-center gap-1">
+                            {selectedPairs.length > 1 ? 'Multi-Asset' : selectedPairs[0]} <ChevronDown color="#6b7280" size={14} />
+                        </Text>
+                        <Text className="text-emerald-400 text-xs font-bold">
+                            {selectedPairs.length > 1 ? `${selectedPairs.length} Active Pairs` : '+1.24% • 2034.50'}
+                        </Text>
                     </View>
-                    <ChevronDown color="#9ca3af" size={20} />
                 </TouchableOpacity>
-                <View className="items-end">
-                    <Text className="text-white font-bold font-mono text-lg">2034.50</Text>
-                    <Text className="text-emerald-400 text-xs font-bold">+0.45%</Text>
+
+                {/* Tab Switcher */}
+                <View className="flex-row bg-[#1a1a1a] p-1 rounded-xl border border-white/10">
+                    <TouchableOpacity
+                        className={`px-3 py-1.5 rounded-lg flex-row items-center gap-2 transition-all ${activeTab === 'Chart' ? 'bg-white/10' : ''}`}
+                        onPress={() => setActiveTab('Chart')}
+                    >
+                        <Activity color={activeTab === 'Chart' ? 'white' : '#6b7280'} size={16} />
+                        {activeTab === 'Chart' && <Text className="text-white text-xs font-bold">Chart</Text>}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        className={`px-3 py-1.5 rounded-lg flex-row items-center gap-2 transition-all ${activeTab === 'Chat' ? 'bg-white/10' : ''}`}
+                        onPress={() => setActiveTab('Chat')}
+                    >
+                        <Brain color={activeTab === 'Chat' ? '#f59e0b' : '#6b7280'} size={16} />
+                        {activeTab === 'Chat' && <Text className="text-white text-xs font-bold">AI</Text>}
+                    </TouchableOpacity>
                 </View>
+
+                {/* PAIR SELECTOR DROPDOWN (Inside Header z-index context) */}
+                {showPairSelector && (
+                    <View className="absolute top-[60px] left-5 w-64 bg-[#111] border border-white/10 rounded-2xl shadow-2xl p-2 z-50">
+                        {AVAILABLE_PAIRS.map((pair) => {
+                            const isSelected = selectedPairs.includes(pair.id);
+                            return (
+                                <TouchableOpacity
+                                    key={pair.id}
+                                    className={`flex-row justify-between items-center p-3 rounded-xl mb-1 ${isSelected ? 'bg-violet-500/10 border border-violet-500/20' : 'active:bg-white/5'}`}
+                                    onPress={() => togglePair(pair.id)}
+                                >
+                                    <View>
+                                        <Text className={`font-bold text-sm ${isSelected ? 'text-violet-400' : 'text-gray-300'}`}>{pair.id}</Text>
+                                        <Text className="text-[10px] text-gray-500">{pair.name}</Text>
+                                    </View>
+                                    {isSelected && (
+                                        <View className="bg-violet-500 rounded-full p-0.5">
+                                            <Check size={12} color="white" />
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                )}
             </View>
 
-            {/* Chart Area (Visual Placeholder) */}
-            <View className="flex-1 justify-center items-center relative">
-                <View className="flex-row items-end h-64 px-6 border-b border-white/5 w-full justify-between">
-                    {/* Visual Bars simulating a chart */}
-                    {[40, 60, 55, 70, 65, 80, 75, 90, 85, 100, 95, 110, 105, 120, 115, 130, 125, 140, 135].map((h, i) => (
-                        <ChartBar key={i} height={h + Math.random() * 20} color={i % 2 === 0 ? '#10b981' : '#ef4444'} />
-                    ))}
-                </View>
-                <View className="absolute top-4 left-6 bg-black/40 px-3 py-1 rounded-lg border border-white/10">
-                    <Text className="text-gray-400 text-xs">M15 • XAUUSD</Text>
-                </View>
-            </View>
+            {/* 2. Main Content Area */}
+            <View className="flex-1 z-10" onStartShouldSetResponder={() => setShowPairSelector(false)}>
 
-            {/* Execution Panel */}
-            <View className="bg-dark-card border-t border-white/10 p-6 pb-24">
+                {/* CHART TAB */}
+                <View className={`flex-1 ${activeTab === 'Chart' ? 'flex' : 'hidden'}`}>
+                    {/* Timeframes */}
+                    <View className="flex-row px-4 py-3 gap-2 border-b border-white/5 bg-[#080808]">
+                        {['1M', '5M', '15M', '1H', '4H'].map(tf => (
+                            <TouchableOpacity key={tf} className={`px-3 py-1 rounded-md ${tf === '1H' ? 'bg-violet-500/20 border border-violet-500/50' : 'bg-white/5 border border-white/5'}`}>
+                                <Text className={`text-[10px] font-bold ${tf === '1H' ? 'text-violet-400' : 'text-gray-500'}`}>{tf}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
 
-                {/* Lot Size Control */}
-                <View className="flex-row justify-between items-center mb-6">
-                    <Text className="text-gray-400 font-medium">Volume (Lots)</Text>
-                    <View className="flex-row items-center bg-white/5 rounded-xl border border-white/5">
-                        <TouchableOpacity className="p-3 border-r border-white/10">
-                            <Minus color="#9ca3af" size={18} />
-                        </TouchableOpacity>
-                        <View className="w-20 items-center">
-                            <Text className="text-white font-bold font-mono text-lg">1.00</Text>
-                        </View>
-                        <TouchableOpacity className="p-3 border-l border-white/10">
-                            <Plus color="#9ca3af" size={18} />
-                        </TouchableOpacity>
+                    {/* Chart Visualization */}
+                    <View className="flex-1 bg-[#050505]">
+                        <LiveChart />
                     </View>
                 </View>
 
-                {/* Buy/Sell Buttons */}
-                <View className="flex-row gap-4">
-                    <TouchableOpacity className="flex-1 bg-rose-500/10 border border-rose-500/50 rounded-2xl py-4 items-center active:bg-rose-500/20">
-                        <Text className="text-rose-500 font-bold text-sm mb-1">SELL</Text>
-                        <Text className="text-white font-bold text-xl font-mono">2034.45</Text>
-                    </TouchableOpacity>
+                {/* CHAT TAB (PipFlow AI) */}
+                <View className={`flex-1 bg-[#0a0a0a] ${activeTab === 'Chat' ? 'flex' : 'hidden'}`}>
+                    <ScrollView
+                        className="flex-1 px-4 py-4"
+                        contentContainerStyle={{ paddingBottom: 100 }}
+                    >
+                        {/* AI Greeting / Status */}
+                        <View className="mb-6 flex-row items-center gap-3 bg-white/5 p-4 rounded-xl border border-white/5">
+                            <View className="w-10 h-10 rounded-full bg-cyan-500/20 items-center justify-center border border-cyan-500/30">
+                                <Activity color="#22d3ee" size={20} />
+                            </View>
+                            <View>
+                                <Text className="text-white font-bold text-sm">System Online</Text>
+                                <Text className="text-cyan-400 text-xs">Latency: 12ms</Text>
+                            </View>
+                        </View>
 
-                    <TouchableOpacity className="flex-1 bg-emerald-500/10 border border-emerald-500/50 rounded-2xl py-4 items-center active:bg-emerald-500/20">
-                        <Text className="text-emerald-500 font-bold text-sm mb-1">BUY</Text>
-                        <Text className="text-white font-bold text-xl font-mono">2034.55</Text>
-                    </TouchableOpacity>
+                        {messages.map((msg) => (
+                            <View key={msg.id} className={`flex-row mb-4 ${msg.sender === 'User' ? 'justify-end' : 'justify-start'}`}>
+                                {msg.sender === 'AI' && (
+                                    <View className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 items-center justify-center mr-2 shadow-lg shadow-cyan-500/20">
+                                        <Zap size={14} color="white" fill="white" />
+                                    </View>
+                                )}
+                                <View className={`max-w-[80%] p-3 rounded-2xl ${msg.sender === 'User' ? 'bg-violet-600 rounded-tr-none' : 'bg-[#1a1a1a] border border-white/5 rounded-tl-none'}`}>
+                                    <Text className="text-white text-sm leading-5">{msg.text}</Text>
+                                    <Text className="text-gray-500 text-[10px] text-right mt-1">{msg.time}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </ScrollView>
+
+                    {/* Input - FIXED LAYOUT with pb-24*/}
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+                    >
+                        <View className="p-4 border-t border-white/5 bg-[#0a0a0a] flex-row gap-2 pb-24">
+                            <TextInput
+                                value={input}
+                                onChangeText={setInput}
+                                placeholder="Ask PipFlow..."
+                                placeholderTextColor="#666"
+                                className="flex-1 bg-[#151515] border border-white/10 rounded-xl px-4 text-white h-12"
+                            />
+                            <TouchableOpacity
+                                onPress={sendMessage}
+                                className="w-12 h-12 bg-violet-600 rounded-xl items-center justify-center active:bg-violet-700"
+                            >
+                                <Send color="white" size={20} />
+                            </TouchableOpacity>
+                        </View>
+                    </KeyboardAvoidingView>
                 </View>
             </View>
         </SafeAreaView>
